@@ -2,7 +2,7 @@ seng440Huffman
 ==============
 Change the url in .git/config from
 
-url = https://git@github.com/thisGitRepo
+url = https://github.com/thisGitRepo
 
 to
 
