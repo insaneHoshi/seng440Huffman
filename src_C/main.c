@@ -59,7 +59,7 @@ unsigned int getEncodedData(int numBits, struct structFP *myFileParser){
 
 }
 
-void printbits(unsigned int v) {
+void printbits(char v) {
    for (; v; v >>= 1) 
       putchar('0' + (v & 1));
    
@@ -69,37 +69,85 @@ void printbits(unsigned int v) {
 int main(int argc, char *argv[]){
 
 	unsigned int input = 0b01011011101011011100000000000000;
-	unsigned int tmp;
+	//unsigned int tmp;
 	unsigned int shift;
 	unsigned int count = 29;
 	unsigned int tableEntry=0;
 	unsigned int character;
 	
-	struct structFP *myFileParser;
-	*myFileParser = newFP();
+	FILE *ptr_File;
 	
-	while(input != 0)
-	{
-		tmp = input;
-		
-		tmp=tmp>>count;
-		//printf("%u\n",tmp);
-		
-		tableEntry = lookup[tmp];
+	ptr_File = fopen("encoded.dat","rb");
+	
+	if (!ptr_File)
+		{
+			printf("Unable to open file!");
+			ptr_File = NULL;
+		}
+	
+	unsigned char tmpData;
+	unsigned char buffer;
+	unsigned char tmp;
+	shift = 0;
+	int read = 1;
+	fread(&buffer,sizeof(char),1,ptr_File);
+	//tmpData = buffer;
+	while(read){
+		//printbits(tmpData);
+		//set temp data = to buffer and shift to only get key length bits
+		tmpData = buffer >> 5; //check this later
+		//Do the lookup
+		tableEntry = lookup[tmpData];
+		//Get the character in the first 8 bits
 		character = tableEntry >>8;
-		shift = tableEntry&0b0000000011111111;
-		
-		
-		//printf("count: %d ", count);
-		printbits(input);
 		printf("%c\n", character);
-		//printf("%u\n", input);
-		input = input << shift;
-		//printf("%u\n", input);
+		//printbits(tmpData);
+		//Get the shift value in the last 8 bits
+		shift = tableEntry&0b0000000011111111;
+                //buffer = buffer << shift;
 		
+		/*//Do it again because we know we can
+		//set temp data = to buffer and shift to only get key length bits
+		tmpData = buffer >> 5;
+		//Do the lookup
+		tableEntry = lookup[tmpData];
+		//Get the character in the first 8 bits
+		character = tableEntry >>8;
+		printf("%c\n", character);
+		//printbits(tmpData);
+		//Get the shift value in the last 8 bits
+		shift += tableEntry&0b0000000011111111;
+		
+		*/
+		//We don't know how much remains in buffer so need to be careful
+		tmpData = buffer << shift;
+		//Now read in new data
+		read = fread(&buffer,sizeof(char),1,ptr_File);
+                //tmp = tmp >> (8-shift);
+		buffer = tmpData|(buffer >> (8-shift));
+                shift = 0;
+		
+	/*tmp = tmpData;
+	
+	tmp=tmp>>count;
+	//printf("%u\n",tmp);
+	
+	tableEntry = lookup[tmp];
+	character = tableEntry >>8;
+	shift = tableEntry&0b0000000011111111;
+	
+	
+	//printf("count: %d ", count);
+	printbits(tmpData);
+	printf("%c\n", character);
+	//printf("%u\n", input);
+	tmpData = tmpData << shift;
+	//printf("%u\n", input);
+	*/
+	
 	}
 	
-	closeFP(*myFileParser);
+	fclose(ptr_File);
 	return 0;
 }
 
