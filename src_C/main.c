@@ -2,6 +2,7 @@
 This is a tmp main file
 */
 #include <stdio.h>
+#include <stdlib.h>
 
 //The lookup table that takes x bits of the huffman encoded input, and then gets the appropriate code for that input.
 static const int lookup[8] =
@@ -68,7 +69,6 @@ void printbits(char v) {
 
 int main(int argc, char *argv[]){
 
-	unsigned int input = 0b01011011101011011100000000000000;
 	//unsigned int tmp;
 	unsigned int shift;
 	unsigned int count = 29;
@@ -76,32 +76,37 @@ int main(int argc, char *argv[]){
 	unsigned int character;
 	
 	FILE *ptr_File;
-	
+	FILE *ptr_OutFile;
 	ptr_File = fopen("encoded.dat","rb");
-	
+	ptr_OutFile = fopen("DecodedOutput.txt","w");
 	if (!ptr_File)
 		{
 			printf("Unable to open file!");
 			ptr_File = NULL;
 		}
 	
+	char outData[100] = "";
+	outData[99] = "\0";
+	unsigned int outDataCount = 0;
 	unsigned char tmpData;
 	unsigned char buffer;
 	unsigned char tmp;
+
 	shift = 0;
 	int read = 1;
 	fread(&buffer,sizeof(char),1,ptr_File);
 	//tmpData = buffer;
 	while(read){
-		//printbits(tmpData);
 		//set temp data = to buffer and shift to only get key length bits
 		tmpData = buffer >> 5; //check this later
 		//Do the lookup
 		tableEntry = lookup[tmpData];
 		//Get the character in the first 8 bits
 		character = tableEntry >>8;
+		sprintf(outData+outDataCount,"%c",character);
+		outDataCount++;
 		printf("%c\n", character);
-		//printbits(tmpData);
+
 		//Get the shift value in the last 8 bits
 		shift = tableEntry&0b0000000011111111;
                 //buffer = buffer << shift;
@@ -114,7 +119,7 @@ int main(int argc, char *argv[]){
 		//Get the character in the first 8 bits
 		character = tableEntry >>8;
 		printf("%c\n", character);
-		//printbits(tmpData);
+
 		//Get the shift value in the last 8 bits
 		shift += tableEntry&0b0000000011111111;
 		
@@ -126,27 +131,30 @@ int main(int argc, char *argv[]){
                 //tmp = tmp >> (8-shift);
 		buffer = tmpData|(buffer >> (8-shift));
                 shift = 0;
-		
+                
 	/*tmp = tmpData;
 	
 	tmp=tmp>>count;
-	//printf("%u\n",tmp);
 	
 	tableEntry = lookup[tmp];
 	character = tableEntry >>8;
 	shift = tableEntry&0b0000000011111111;
-	
-	
-	//printf("count: %d ", count);
+
 	printbits(tmpData);
-	printf("%c\n", character);
-	//printf("%u\n", input);
+
 	tmpData = tmpData << shift;
-	//printf("%u\n", input);
+
 	*/
-	
+		if(outDataCount == 99 || !read){
+		//Output Out Data to a file
+			if(!read){
+			outData[outDataCount]="\0";
+			}
+		fputs(outData,ptr_OutFile);
+		outDataCount = 0;
+		}
 	}
-	
+	fclose(ptr_OutFile);
 	fclose(ptr_File);
 	return 0;
 }
