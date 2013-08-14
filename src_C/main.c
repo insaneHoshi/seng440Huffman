@@ -3,6 +3,10 @@ This is a tmp main file
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <stdint.h>
+
+
 
 //The lookup table that takes x bits of the huffman encoded input, and then gets the appropriate code for that input.
 static const int lookup[8] =
@@ -26,7 +30,7 @@ struct structFP newFP(){
 	
 	myFileParser.tmpData = " ";
 	myFileParser.bitsRead = 0;
-	myFileParser.ptr_File = fopen("encoded.dat","rb");
+	myFileParser.ptr_File = fopen("encoded1.dat","rb");
 	
 	if (!myFileParser.ptr_File)
 		{
@@ -60,40 +64,44 @@ unsigned int getEncodedData(int numBits, struct structFP *myFileParser){
 
 }
 
-void printbits(char v) {
-   for (; v; v >>= 1) 
-      putchar('0' + (v & 1));
-   
-   printf("\n");
+void printbits(char outData[100], FILE *ptr_OutFile) {
+   fputs(outData,ptr_OutFile);
 }
 
 int main(int argc, char *argv[]){
 
     //unsigned int tmp;
+    
     unsigned int shift;
     unsigned int shift2 = 0;
     unsigned int count = 29;
     unsigned int tableEntry=0;
     unsigned int character;
     unsigned int size = 1;
-
+	
     FILE *ptr_File;
     FILE *ptr_OutFile;
+    system("pwd");
     ptr_File = fopen("encoded.dat","rb");
-    ptr_OutFile = fopen("DecodedOutput.txt","w");
     if (!ptr_File)
             {
+            		perror("Error");
                     printf("Unable to open file!");
                     ptr_File = NULL;
+                    exit(0);
             }
+    ptr_OutFile = fopen("DecodedOutput.txt","w");
+    
 
     char outData[100] = "";
     outData[99] = "\0";
+    char * q = outData[0];
     unsigned int outDataCount = 0;
     unsigned char tmpData;
-    unsigned long int buffer = 0;
-    unsigned long int buffer2 = 0;
+    unsigned int buffer = 0;
+    unsigned int buffer2 = 0;
     unsigned char tmp;
+    int t = sizeof(outDataCount);
     unsigned int overflow = 0;
     shift = 0;
     int read = 1;
@@ -109,9 +117,10 @@ int main(int argc, char *argv[]){
         tableEntry = lookup[tmpData];
         //Get the character in the first 8 bits
         character = tableEntry >>8;
-        sprintf(outData+outDataCount,"%c",character);
+        outData[outDataCount] = (char) character;
+        //sprintf(outData+outDataCount,"%c",character);
         outDataCount++;
-        printf("%c\n", character);
+        //printf("%c\n", character);
         shift = tableEntry & 0b0000000011111111;
         shift2 +=shift;
         //We don't know how much remains in buffer so need to be careful
@@ -135,9 +144,10 @@ int main(int argc, char *argv[]){
         if(outDataCount == 99 || !size){
         //Output Out Data to a file
                 if(!size){
-                outData[outDataCount+1]=EOF;
+                outData[outDataCount]='\000';
                 }
-        fputs(outData,ptr_OutFile);
+        //fputs(outData,ptr_OutFile);
+        printbits(outData, ptr_OutFile);
         outDataCount = 0;
         }
 
@@ -154,13 +164,14 @@ int main(int argc, char *argv[]){
         tableEntry = lookup[tmpData];
         //Get the character in the first 8 bits
         character = tableEntry >>8;
-        sprintf(outData+outDataCount,"%c",character);
+        outData[outDataCount] = (char) character;
+        //sprintf(outData+outDataCount,"%c",character);
         outDataCount++;
         printf("%c\n", character);
         shift = tableEntry & 0b0000000011111111;
         buffer = buffer << shift;
     }
-    outData[outDataCount+1]=EOF;
+    outData[outDataCount]='\000';
     fputs(outData,ptr_OutFile);
     
     fclose(ptr_OutFile);
