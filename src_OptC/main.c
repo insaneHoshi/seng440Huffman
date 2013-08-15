@@ -17,56 +17,10 @@ static const int lookup[8] =
 //This is the length that is "shaved" off the front of the input to determin what letter it is.
 static const int huffBinLength = 3;
 
-//struct for data parsing.
-struct structFP {
-	FILE *ptr_File;
-	char tmpData;
-	int bitsRead;
-};
-
-struct structFP newFP(){
-	
-	struct structFP myFileParser;
-	
-	myFileParser.tmpData = " ";
-	myFileParser.bitsRead = 0;
-	myFileParser.ptr_File = fopen("encoded1.dat","rb");
-	
-	if (!myFileParser.ptr_File)
-		{
-			printf("Unable to open file!");
-			myFileParser.ptr_File = NULL;
-		}
-	
-	return myFileParser;
-}
-
-void closeFP(struct structFP myFileParser) {
-	fclose(myFileParser.ptr_File);
-
-}
-
-unsigned int getEncodedData(int numBits, struct structFP *myFileParser){
-	unsigned int copy = 0;
-	if(myFileParser->bitsRead == 0)
-	{//initial read
-	
-	fread(&myFileParser->tmpData,sizeof(char),1,myFileParser->ptr_File);
-	
-	copy = (int) myFileParser->tmpData;
-	copy = copy >>numBits;
-	
-	myFileParser->bitsRead+=numBits;
-
-	}
-	
-	return copy;
-
-}
-
+/*
 void printbits(char outData[100], FILE *ptr_OutFile) {
    fputs(outData,ptr_OutFile);
-}
+}*/
 
 int main(int argc, char *argv[]){
 
@@ -85,7 +39,7 @@ int main(int argc, char *argv[]){
     ptr_File = fopen("encoded.dat","rb");
     if (!ptr_File)
             {
-            		perror("Error");
+            	    perror("Error");
                     printf("Unable to open file!");
                     ptr_File = NULL;
                     exit(0);
@@ -176,14 +130,5 @@ int main(int argc, char *argv[]){
     
     fclose(ptr_OutFile);
     fclose(ptr_File);
-    return 0;
-}
-
-
-
-int getLookupTable(){
-
-
-
     return 0;
 }
