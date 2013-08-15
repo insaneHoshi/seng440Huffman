@@ -44,13 +44,21 @@ int main(int argc, char *argv[]){
 
     //unsigned int tmp;
     
-    unsigned int shift;
+    unsigned int shift = 0;
     unsigned int shift2 = 0;
-    unsigned int count = 29;
     unsigned int tableEntry=0;
     unsigned int character;
     unsigned int size = 0;
-	
+    char outData[100] = "";
+    char * q = outData[0];
+    unsigned int outDataCount = 0;
+    unsigned int tmpData;
+    outData[99] = "\0";
+    uint64_t buffer = 0;
+    uint64_t buffer2 = 0;
+    char * point = &buffer;
+    unsigned int overflow = 0;
+    
     FILE *ptr_File;
     FILE *ptr_OutFile;
     ptr_File = fopen("alphabet.dat","rb");
@@ -64,19 +72,8 @@ int main(int argc, char *argv[]){
     ptr_OutFile = fopen("DecodedOutput.txt","w");
     
 
-    char outData[100] = "";
-    outData[99] = "\0";
-    char * q = outData[0];
-    unsigned int outDataCount = 0;
-    unsigned int tmpData;
-    uint64_t buffer = 0;
-    uint64_t buffer2 = 0;
-    unsigned char tmp;
-    char * point = &buffer;
-    int t = sizeof(outDataCount);
-    unsigned int overflow = 0;
-    shift = 0;
-    int read = 1;
+    
+
     size += fread(point+5,sizeof(char),1,ptr_File);
     size += fread(point+4,sizeof(char),1,ptr_File);
     size += fread(point+3,sizeof(char),1,ptr_File);
