@@ -129,8 +129,8 @@ int main(int argc, char *argv[]){
                 if(!size){
                 outData[outDataCount]='\000';
                 }
-        //fputs(outData,ptr_OutFile);
-        printbits(outData, ptr_OutFile);
+        fputs(outData,ptr_OutFile);
+        //printbits(outData, ptr_OutFile);
         outDataCount = 0;
         }
 
