@@ -50,13 +50,12 @@ int main(int argc, char *argv[]){
     unsigned int character;
     unsigned int size = 0;
     char outData[100] = "";
-    char * q = outData[0];
     unsigned int outDataCount = 0;
     unsigned int tmpData;
     outData[99] = '\000';
     uint64_t buffer = 0;
     uint64_t buffer2 = 0;
-    char * point = &buffer;
+    char * point = (char*)&buffer;
     unsigned int overflow = 0;
     
     FILE *ptr_File;
