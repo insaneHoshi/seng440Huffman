@@ -44,19 +44,22 @@ int main(int argc, char *argv[]){
 
     //unsigned int tmp;
     
-    unsigned int shift = 0;
-    unsigned int total_shift = 0;
-    unsigned int tableEntry=0;
+    register unsigned int shift  = 0;
+    register unsigned int total_shift  = 0;
+    unsigned int tableEntry;
     unsigned int character;
-    unsigned int size = 0;
+    register unsigned int size  = 0;
     char outData[100] = "";
-    unsigned int outDataCount = 0;
+    register unsigned int outDataCount;
+	
+	outDataCount = 0;
     unsigned int tmpData;
     outData[99] = '\000';
     uint64_t buffer = 0;
     uint64_t buffer2 = 0;
     char * point = (char*)&buffer;
     unsigned int overflow = 0;
+    uint64_t * hope = buffer;
     
     FILE *ptr_File;
     FILE *ptr_OutFile;
@@ -69,8 +72,6 @@ int main(int argc, char *argv[]){
                     exit(0);
             }
     ptr_OutFile = fopen("DecodedOutput.txt","w");
-    
-
     
 
     size += fread(point+5,sizeof(char),1,ptr_File);
