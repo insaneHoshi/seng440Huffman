@@ -1,1 +1,0 @@
-gcc -pg main.c
