@@ -8,7 +8,6 @@ This is a tmp main file
 #include <inttypes.h>
 
 
-
 //The lookup table that takes x bits of the huffman encoded input, and then gets the appropriate code for that input.
 static const int lookup[1024] =
 	{ 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 
@@ -40,6 +39,8 @@ static const int lookup[1024] =
 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 0b0110001100000101, 
 };
 
+
+
 int main(int argc, char *argv[]){
 
     //unsigned int tmp;
@@ -57,9 +58,8 @@ int main(int argc, char *argv[]){
     outData[99] = '\000';
     uint64_t buffer = 0;
     uint64_t buffer2 = 0;
-    char * point = (char*)&buffer;
+    //char * point = (char*)&buffer;
     unsigned int overflow = 0;
-    uint64_t * hope = buffer;
     
     FILE *ptr_File;
     FILE *ptr_OutFile;
@@ -73,15 +73,22 @@ int main(int argc, char *argv[]){
             }
     ptr_OutFile = fopen("DecodedOutput.txt","w");
     
+    size += fread(&buffer,sizeof(char),6,ptr_File);
+    buffer=(0xff00ff00ff00ffULL&(buffer>> 8))|((0xff00ff00ff00ffULL&buffer)<< 8);
+        buffer=(0xffff0000ffffULL&(buffer>>16))|((0xffff0000ffffULL&buffer)<<16);
+        buffer = (0xffffffffULL&(buffer>>32))|((0xffffffffULL&buffer)<<32);
+    
+    
+    //buffer = bswap_64(buffer);
 
-    size += fread(point+5,sizeof(char),1,ptr_File);
-    size += fread(point+4,sizeof(char),1,ptr_File);
-    size += fread(point+3,sizeof(char),1,ptr_File);
-    size += fread(point+2,sizeof(char),1,ptr_File);
-    size += fread(point+1,sizeof(char),1,ptr_File);
-    size += fread(point,sizeof(char),1,ptr_File);
+//    size += fread(point+5,sizeof(char),1,ptr_File);
+//    size += fread(point+4,sizeof(char),1,ptr_File);
+//    size += fread(point+3,sizeof(char),1,ptr_File);
+//    size += fread(point+2,sizeof(char),1,ptr_File);
+//    size += fread(point+1,sizeof(char),1,ptr_File);
+//    size += fread(point,sizeof(char),1,ptr_File);
     size = size << 3;
-    buffer = buffer << 16;
+    //buffer = buffer << 16;
     //tmpData = buffer;
     while(size){
 
@@ -104,15 +111,19 @@ int main(int argc, char *argv[]){
             overflow += 48 - total_shift;
             buffer = 0;
             size = 0;
-            size += fread(point+5,sizeof(char),1,ptr_File);
-            size += fread(point+4,sizeof(char),1,ptr_File);
-            size += fread(point+3,sizeof(char),1,ptr_File);
-            size += fread(point+2,sizeof(char),1,ptr_File);
-            size += fread(point+1,sizeof(char),1,ptr_File);
-            size += fread(point,sizeof(char),1,ptr_File);
+//            size += fread(point+5,sizeof(char),1,ptr_File);
+//            size += fread(point+4,sizeof(char),1,ptr_File);
+//            size += fread(point+3,sizeof(char),1,ptr_File);
+//            size += fread(point+2,sizeof(char),1,ptr_File);
+//            size += fread(point+1,sizeof(char),1,ptr_File);
+//            size += fread(point,sizeof(char),1,ptr_File);
+             size += fread(&buffer,sizeof(char),6,ptr_File);
+             buffer=(0xff00ff00ff00ffULL&(buffer>> 8))|((0xff00ff00ff00ffULL&buffer)<< 8);
+        buffer=(0xffff0000ffffULL&(buffer>>16))|((0xffff0000ffffULL&buffer)<<16);
+        buffer = (0xffffffffULL&(buffer>>32))|((0xffffffffULL&buffer)<<32);
             size = size << 3;
             //tmp = tmp >> (8-shift);
-            buffer = buffer2|(buffer << (16-overflow));
+            buffer = buffer2|(buffer >> overflow);
             total_shift = 0;
             buffer2 = 0;
         }
