@@ -1,0 +1,1 @@
+arm-linux-gcc -static -S ../src_OptC/main.c
