@@ -44,34 +44,34 @@ int main(int argc, char *argv[]){
 
     //unsigned int tmp;
     
-    unsigned int shift = 0;
-    unsigned int shift2 = 0;
-    unsigned int tableEntry=0;
+    register unsigned int shift  = 0;
+    register unsigned int total_shift  = 0;
+    unsigned int tableEntry;
     unsigned int character;
-    unsigned int size = 0;
+    register unsigned int size  = 0;
     char outData[100] = "";
-    char * q = outData[0];
-    unsigned int outDataCount = 0;
+    register unsigned int outDataCount;
+	
+	outDataCount = 0;
     unsigned int tmpData;
-    outData[99] = "\0";
+    outData[99] = '\000';
     uint64_t buffer = 0;
     uint64_t buffer2 = 0;
-    char * point = &buffer;
+    char * point = (char*)&buffer;
     unsigned int overflow = 0;
+    uint64_t * hope = buffer;
     
     FILE *ptr_File;
     FILE *ptr_OutFile;
     ptr_File = fopen("alphabet.dat","rb");
     if (!ptr_File)
             {
-            		perror("Error");
+                        perror("Error");
                     printf("Unable to open file!");
                     ptr_File = NULL;
                     exit(0);
             }
     ptr_OutFile = fopen("DecodedOutput.txt","w");
-    
-
     
 
     size += fread(point+5,sizeof(char),1,ptr_File);
@@ -96,12 +96,12 @@ int main(int argc, char *argv[]){
         outDataCount++;
         //printf("%c\n", character);
         shift = tableEntry & 0b0000000011111111;
-        shift2 +=shift;
+        total_shift +=shift;
         //We don't know how much remains in buffer so need to be careful
         //Now read in new data
-        if(shift2 >= size+overflow-10){
+        if(total_shift >= size+overflow-10){
             buffer2 = buffer << shift;
-            overflow += 48 - shift2;
+            overflow += 48 - total_shift;
             buffer = 0;
             size = 0;
             size += fread(point+5,sizeof(char),1,ptr_File);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]){
             size = size << 3;
             //tmp = tmp >> (8-shift);
             buffer = buffer2|(buffer << (16-overflow));
-            shift2 = 0;
+            total_shift = 0;
             buffer2 = 0;
         }
         else

@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
     
 
     char outData[100] = "";
-    outData[99] = "\0";
+    outData[99] = '\000';
     char * q = outData[0];
     unsigned int outDataCount = 0;
     unsigned int tmpData;
