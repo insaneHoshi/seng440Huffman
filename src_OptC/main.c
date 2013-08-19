@@ -8,7 +8,7 @@ This is a tmp main file
 #include <inttypes.h>
 
 
-//The lookup table that takes x bits of the huffman encoded input, and then gets the appropriate code for that input.
+//The lookup table that takes 10 bits of the huffman encoded input, and then gets the appropriate code for that input.
 static const int lookup[1024] =
 	{ 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 0b0111011100000110, 
 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 0b0110110100000110, 
@@ -43,7 +43,6 @@ static const int lookup[1024] =
 
 int main(int argc, char *argv[]){
 
-    //unsigned int tmp;
     
     register unsigned int shift  = 0;
     register unsigned int total_shift  = 0;
@@ -58,8 +57,8 @@ int main(int argc, char *argv[]){
     outData[99] = '\000';
     uint64_t buffer = 0;
     uint64_t buffer2 = 0;
-    //char * point = (char*)&buffer;
     unsigned int overflow = 0;
+	int count = 0;
     
     FILE *ptr_File;
     FILE *ptr_OutFile;
@@ -75,53 +74,37 @@ int main(int argc, char *argv[]){
     
     size += fread(&buffer,sizeof(char),6,ptr_File);
     buffer=(0xff00ff00ff00ffULL&(buffer>> 8))|((0xff00ff00ff00ffULL&buffer)<< 8);
-        buffer=(0xffff0000ffffULL&(buffer>>16))|((0xffff0000ffffULL&buffer)<<16);
-        buffer = (0xffffffffULL&(buffer>>32))|((0xffffffffULL&buffer)<<32);
-    
-    
-    //buffer = bswap_64(buffer);
-
-//    size += fread(point+5,sizeof(char),1,ptr_File);
-//    size += fread(point+4,sizeof(char),1,ptr_File);
-//    size += fread(point+3,sizeof(char),1,ptr_File);
-//    size += fread(point+2,sizeof(char),1,ptr_File);
-//    size += fread(point+1,sizeof(char),1,ptr_File);
-//    size += fread(point,sizeof(char),1,ptr_File);
+	buffer=(0xffff0000ffffULL&(buffer>>16))|((0xffff0000ffffULL&buffer)<<16);
+	buffer = (0xffffffffULL&(buffer>>32))|((0xffffffffULL&buffer)<<32);
     size = size << 3;
-    //buffer = buffer << 16;
-    //tmpData = buffer;
+	
     while(size){
 
         //set temp data = to buffer and shift to only get key length bits
-        tmpData = buffer >> 54; //check this later
+        tmpData = buffer >> 54; 
         //Do the lookup
         tableEntry = lookup[tmpData];
+		
         //Get the character in the first 8 bits
         character = tableEntry >>8;
         outData[outDataCount] = (char) character;
-        //sprintf(outData+outDataCount,"%c",character);
         outDataCount++;
-        //printf("%c\n", character);
         shift = tableEntry & 0b0000000011111111;
         total_shift +=shift;
-        //We don't know how much remains in buffer so need to be careful
-        //Now read in new data
+		
+        //Check if sufficent space left
         if(total_shift >= size+overflow-10){
             buffer2 = buffer << shift;
             overflow += 48 - total_shift;
             buffer = 0;
             size = 0;
-//            size += fread(point+5,sizeof(char),1,ptr_File);
-//            size += fread(point+4,sizeof(char),1,ptr_File);
-//            size += fread(point+3,sizeof(char),1,ptr_File);
-//            size += fread(point+2,sizeof(char),1,ptr_File);
-//            size += fread(point+1,sizeof(char),1,ptr_File);
-//            size += fread(point,sizeof(char),1,ptr_File);
+
              size += fread(&buffer,sizeof(char),6,ptr_File);
              buffer=(0xff00ff00ff00ffULL&(buffer>> 8))|((0xff00ff00ff00ffULL&buffer)<< 8);
         buffer=(0xffff0000ffffULL&(buffer>>16))|((0xffff0000ffffULL&buffer)<<16);
         buffer = (0xffffffffULL&(buffer>>32))|((0xffffffffULL&buffer)<<32);
             size = size << 3;
+			count++;
             //tmp = tmp >> (8-shift);
             buffer = buffer2|(buffer >> overflow);
             total_shift = 0;
@@ -138,33 +121,25 @@ int main(int argc, char *argv[]){
                 outData[outDataCount]='\000';
                 }
         fputs(outData,ptr_OutFile);
-        //printbits(outData, ptr_OutFile);
         outDataCount = 0;
         }
-
-
-
 
 
     }
     
     while(buffer)
     {
-        tmpData = buffer >> 54; //check this later
+        tmpData = buffer >> 54; 
         //Do the lookup
         tableEntry = lookup[tmpData];
-        //Get the character in the first 8 bits
         character = tableEntry >>8;
         outData[outDataCount] = (char) character;
-        //sprintf(outData+outDataCount,"%c",character);
         outDataCount++;
-        //printf("%c\n", character);
         shift = tableEntry & 0b0000000011111111;
         buffer = buffer << shift;
     }
     outData[outDataCount]='\000';
     fputs(outData,ptr_OutFile);
-    
     fclose(ptr_OutFile);
     fclose(ptr_File);
     return 0;
