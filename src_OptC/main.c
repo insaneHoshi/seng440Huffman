@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
     ptr_File = fopen("alphabet.dat","rb");
     if (!ptr_File)
             {
-                        perror("Error");
+                    perror("Error");
                     printf("Unable to open file!");
                     ptr_File = NULL;
                     exit(0);
